@@ -16,9 +16,9 @@ const CreateFetch = async (
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      ...(body ? { body: JSON.stringify(body) } : {})
+      ...(body ? { body: JSON.stringify(body) } : {}),
     };
 
     const base = process.env.REACT_APP_BACKEND?.endsWith("/")
@@ -100,28 +100,32 @@ export async function UpdatePassword(body: { password: string }) {
   return CreateFetch("PATCH", "user/update-password", body);
 }
 
-
-
 // ------------------- Beneficiary -------------------
 export async function BeneficiaryList() {
   return CreateFetch("GET", "beneficiary");
 }
 
-export async function AddBeneficiary(body: { nickname: string; account_no: string; bank: string }) {
+export async function AddBeneficiary(body: {
+  nickname: string;
+  account_no: string;
+  bank: string;
+}) {
   return CreateFetch("POST", "beneficiary/", body);
 }
 
-export async function EditBeneficiary(id:string ,body: { nickname: string }) {
+export async function EditBeneficiary(id: string, body: { nickname: string }) {
   return CreateFetch("PATCH", `beneficiary/${id}`, body);
 }
 
-
-export async function DeleteBeneficiary(id:string) {
+export async function DeleteBeneficiary(id: string) {
   return CreateFetch("DELETE", `beneficiary/${id}`);
 }
 
 // ------------------- Transaction -------------------
-export async function TransferToBeneficiary(id:string, body: { amount: number }) {
+export async function TransferToBeneficiary(
+  id: string,
+  body: { amount: number },
+) {
   return CreateFetch("POST", `transaction/transfer/${id}`, body);
 }
 
@@ -136,10 +140,12 @@ export async function UserTicketList() {
   return CreateFetch("GET", "ticket/"); // FIXED: singular
 }
 
-export async function CreateTicket(body: { subject?: string; message: string }) {
+export async function CreateTicket(body: {
+  subject?: string;
+  message: string;
+}) {
   return CreateFetch("POST", "ticket/", body);
 }
-
 
 // ------------------- Admin -------------------
 export async function AdminTicketList() {
@@ -154,26 +160,32 @@ export async function AdminUserList() {
   return CreateFetch("GET", "admin/users", undefined, true);
 }
 
-export async function AdminUserCards(body: { userId: string }) {
-  return CreateFetch("GET", `admin/user-cards?userId=${body.userId}`, undefined, true);
+export async function AdminUserCards(id: string) {
+  return CreateFetch("GET", `admin/user-cards/${id}`, undefined, true);
 }
 
-
-export async function AdminChangeAccountPlan(body: { cid: number; type: string }) {
+export async function AdminChangeAccountPlan(body: {
+  cid: number;
+  type: string;
+}) {
   return CreateFetch("POST", "admin/change-account-plan", body);
 }
 
-export async function AdminIssueCard(id: string, body : { type: string }) {
+export async function AdminIssueCard(id: string, body: { type: string }) {
   return CreateFetch("POST", `admin/issue-card/${id}`, body);
 }
 
-export async function AdminBlockCard(body: { cardidid: number }) {
+export async function AdminBlockCard(body: { cardId: number }) {
   return CreateFetch("POST", "admin/block-card", body);
 }
 
 export async function AdminCloseAccount(id: string) {
   return CreateFetch("POST", `admin/close-account/${id}`);
 }
+
+export async function AdminAddMoney(id: string, body: { amount: number }) {
+  return CreateFetch("POST", `admin/add-money/${id}`, body);
+}
 export async function BuyCompanyProduct(body: any) {
-  return CreateFetch("POST", "company/buy", body);
+  return CreateFetch("POST", "product/buy", body);
 }
