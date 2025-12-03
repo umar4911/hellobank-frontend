@@ -31,7 +31,6 @@ function IssueCardModal({ ModalRef, Reset }) {
     enableReinitialize: true,
 
     initialValues: {
-      cid,
       type: "Silver",
     },
     validationSchema: Yup.object({
@@ -42,7 +41,7 @@ function IssueCardModal({ ModalRef, Reset }) {
         if (APIWorking) return;
 
         setAPIWorking(true);
-        const res = await ApiManager.AdminIssueCard(values);
+        const res = await ApiManager.AdminIssueCard(cid, values);
         if (res) {
           toast.success(`Card issued`);
           Reset();

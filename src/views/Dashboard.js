@@ -68,66 +68,6 @@ function Dashboard(props) {
             )}
           </Col>
         </Row>
-        <Row>
-          <Col>
-            {MainData === null ? (
-              <Loader />
-            ) : (
-              <Card className="card-chart">
-                <CardHeader>
-                  <h5 className="card-category">Account Type</h5>
-                  <CardTitle tag="h3">
-                    <i className="tim-icons icon-coins text-info" />{" "}
-                    {MainData.user.type}
-                  </CardTitle>
-                </CardHeader>
-              </Card>
-            )}
-          </Col>
-          <Col>
-            {MainData === null ? (
-              <Loader />
-            ) : (
-              <Card className="card-chart">
-                <CardHeader>
-                  <h5 className="card-category">
-                    Hello Remaining Limit (Rs.{" "}
-                    {FormatNumber(MainData.limits.hellolimit)})
-                  </h5>
-                  <CardTitle tag="h3">
-                    <i className="tim-icons icon-cloud-upload-94 text-info" />{" "}
-                    Rs.{" "}
-                    {FormatNumber(
-                      MainData.limits.hellolimit -
-                        MainData.transactions.hellodebit,
-                    )}
-                  </CardTitle>
-                </CardHeader>
-              </Card>
-            )}
-          </Col>
-          <Col>
-            {MainData === null ? (
-              <Loader />
-            ) : (
-              <Card className="card-chart">
-                <CardHeader>
-                  <h5 className="card-category">
-                    IBFT Remaining Limit (Rs.{" "}
-                    {FormatNumber(MainData.limits.ibftlimit)})
-                  </h5>
-                  <CardTitle tag="h3">
-                    <i className="tim-icons icon-email-85 text-info" /> Rs.{" "}
-                    {FormatNumber(
-                      MainData.limits.ibftlimit -
-                        MainData.transactions.ibftdebit,
-                    )}
-                  </CardTitle>
-                </CardHeader>
-              </Card>
-            )}
-          </Col>
-        </Row>
       </div>
     </>
   );

@@ -16,10 +16,10 @@ import {
 import * as ApiManager from "../../helpers/ApiManager.tsx";
 import Loader from "components/common/Loader.js";
 import moment from "moment";
-import ChangeAccountPlan from "components/admin/ChangeAccountPlan.js";
 import IssueCardModal from "components/admin/IssueCardModal.js";
 import BlockCardModal from "components/admin/BlockCardModal.js";
 import CloseAccountModal from "components/admin/CloseAccountModal.js";
+import AddMoneyModal from "components/admin/AddMoneyModal.js";
 
 function Beneficiary() {
   const [logData, setlogData] = useState([]);
@@ -28,17 +28,15 @@ function Beneficiary() {
   const [accountSelected, setaccountSelected] = useState(null);
   const [AccountData, setAccountData] = useState([]);
 
-  const AccountPlanRef = useRef();
   const IssueCardRef = useRef();
   const BlockCardRef = useRef();
   const CloseAccountRef = useRef();
 
-  // Fetch users on mount
   useEffect(() => {
     let isActive = true;
 
     const fetchUsers = async () => {
-      const res = await ApiManager.AdminUserList(); // Make sure token is included inside this function
+      const res = await ApiManager.AdminUserList();
       if (isActive && res?.status === "success") {
         setlogData(res.data);
         setfilteredData(res.data);
@@ -52,24 +50,22 @@ function Beneficiary() {
     };
   }, []);
 
-  // Fetch selected user's cards
   useEffect(() => {
     let isActive = true;
 
     const fetchUserCards = async () => {
-      if (!accountSelected) return;
-      const res = await ApiManager.AdminUserCards({ userId: accountSelected._id });
+      const res = await ApiManager.AdminUserCards(accountSelected?._id);
       if (isActive && res?.status === "success") {
         setAccountData(res.data);
       }
     };
 
-    fetchUserCards();
+    if (AccountData === null && accountSelected !== null) fetchUserCards();
 
     return () => {
       isActive = false;
     };
-  }, [accountSelected]);
+  }, [accountSelected, AccountData]);
 
   const handleSearch = (text, type) => {
     if (!logData) return;
@@ -81,9 +77,9 @@ function Beneficiary() {
       setfilteredData(
         logData.filter((x) => {
           return type === "cid"
-            ? x._id === lower // use _id from API response
+            ? x._id === lower
             : x[type].toString().toLowerCase().includes(lower);
-        })
+        }),
       );
     }
   };
@@ -97,14 +93,6 @@ function Beneficiary() {
               <Loader />
             ) : (
               <>
-                <ChangeAccountPlan
-                  ModalRef={AccountPlanRef}
-                  Reset={() => {
-                    setAccountData(null);
-                    setaccountSelected(null);
-                    setlogData(null);
-                  }}
-                />
                 <IssueCardModal
                   ModalRef={IssueCardRef}
                   Reset={() => setAccountData(null)}
@@ -113,7 +101,6 @@ function Beneficiary() {
                   ModalRef={BlockCardRef}
                   Reset={() => setAccountData(null)}
                 />
-                {/* User Details Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle tag="h3">User Details</CardTitle>
@@ -141,22 +128,28 @@ function Beneficiary() {
                           <Input value={accountSelected.account_no} disabled />
                         </FormGroup>
                       </Col>
-                      <Col>
-                        <FormGroup>
-                          <label>Account Plan</label>
-                          <Input value={accountSelected.type || "N/A"} disabled />
-                        </FormGroup>
-                      </Col>
                     </Row>
                   </CardBody>
                 </Card>
-                {/* User Cards */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle tag="h3">Add Money</CardTitle>
+                  </CardHeader>
+                  <CardBody className="text-center pl-5 pr-5">
+                    <AddMoneyModal
+                      userId={accountSelected?._id}
+                      Reset={() => setAccountData(null)}
+                    />
+                  </CardBody>
+                </Card>
                 <Card>
                   <CardHeader>
                     <CardTitle tag="h3">User Cards</CardTitle>
                     <Button
                       color="black"
-                      onClick={() => IssueCardRef.current(true, accountSelected._id)}
+                      onClick={() =>
+                        IssueCardRef.current(true, accountSelected._id)
+                      }
                     >
                       Issue new card
                     </Button>
@@ -180,14 +173,20 @@ function Beneficiary() {
                             <td>{moment(card.expiration).format("MM/YYYY")}</td>
                             <td>{card.type}</td>
                             <td>
-                              <Button
-                                color="danger"
-                                onClick={() =>
-                                  BlockCardRef.current(true, { cardid: card._id })
-                                }
-                              >
-                                Block
-                              </Button>
+                              {card.isblocked ? (
+                                "Blocked"
+                              ) : (
+                                <Button
+                                  color="danger"
+                                  onClick={() =>
+                                    BlockCardRef.current(true, {
+                                      cardId: card._id,
+                                    })
+                                  }
+                                >
+                                  Block
+                                </Button>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -201,7 +200,13 @@ function Beneficiary() {
             <Loader />
           ) : (
             <>
-              <CloseAccountModal ModalRef={CloseAccountRef} Reset={() => setlogData(null)} />
+              <CloseAccountModal
+                ModalRef={CloseAccountRef}
+                Reset={() => {
+                  setlogData(null);
+                  setaccountSelected(null);
+                }}
+              />
               <Card>
                 <CardHeader>
                   <CardTitle tag="h3">User List</CardTitle>
@@ -218,7 +223,9 @@ function Beneficiary() {
                         <Input
                           placeholder="Search by Account No"
                           type="text"
-                          onChange={(e) => handleSearch(e.target.value, "account_no")}
+                          onChange={(e) =>
+                            handleSearch(e.target.value, "account_no")
+                          }
                         />
                       </Col>
                     </Row>
@@ -239,22 +246,31 @@ function Beneficiary() {
                       {filteredData.map((user) => (
                         <tr key={user._id}>
                           <td>{user._id}</td>
-                          <td>{user.fname} {user.lname}</td>
+                          <td>
+                            {user.fname} {user.lname}
+                          </td>
                           <td>{user.account_no}</td>
                           <td>
-                            <Badge color={!user.closed ? "primary" : "secondary"}>
+                            <Badge
+                              color={!user.closed ? "primary" : "secondary"}
+                            >
                               {user.closed ? "Closed" : "Open"}
                             </Badge>
                           </td>
                           <td>
                             {!user.closed ? (
                               <>
-                                <Button className="btn-success" onClick={() => setaccountSelected(user)}>
+                                <Button
+                                  className="btn-success"
+                                  onClick={() => setaccountSelected(user)}
+                                >
                                   Account Info
                                 </Button>
                                 <Button
                                   className="ml-2 btn-danger"
-                                  onClick={() => CloseAccountRef.current(true, { userId: user._id })}
+                                  onClick={() =>
+                                    CloseAccountRef.current(true, user._id)
+                                  }
                                 >
                                   Close Account
                                 </Button>
