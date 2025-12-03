@@ -26,7 +26,7 @@ function Beneficiary() {
   const [filteredData, setfilteredData] = useState([]);
 
   const [accountSelected, setaccountSelected] = useState(null);
-  const [AccountData, setAccountData] = useState([]);
+  const [AccountData, setAccountData] = useState(null);
 
   const IssueCardRef = useRef();
   const BlockCardRef = useRef();
