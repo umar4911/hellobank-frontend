@@ -22,7 +22,7 @@ import CloseAccountModal from "components/admin/CloseAccountModal.js";
 import AddMoneyModal from "components/admin/AddMoneyModal.js";
 
 function Beneficiary() {
-  const [logData, setlogData] = useState([]);
+  const [logData, setlogData] = useState(null);
   const [filteredData, setfilteredData] = useState([]);
 
   const [accountSelected, setaccountSelected] = useState(null);
