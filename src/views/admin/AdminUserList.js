@@ -43,12 +43,12 @@ function Beneficiary() {
       }
     };
 
-    fetchUsers();
+    if (logData === null) fetchUsers();
 
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [logData]);
 
   useEffect(() => {
     let isActive = true;
